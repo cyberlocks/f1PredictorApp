@@ -382,11 +382,19 @@ if results_df is not None:
 
     if "position_driverStanding" in results_df.columns:
         st.subheader("Grid position vs. podium probability")
+        scatter_df = results_df.copy()
+        # 'wins' is 0 for most drivers, and Plotly renders a 0-value bubble
+        # as literally 0px even with sizemin set. Add a constant offset so
+        # every driver gets a visible dot, while wins still make a driver's
+        # dot noticeably bigger.
+        scatter_df["marker_size"] = scatter_df["wins"] + 5
+
         fig_scatter = px.scatter(
-            results_df,
+            scatter_df,
             x="grid",
             y="podium_probability",
-            size="wins",
+            size="marker_size",
+            size_max=30,
             color="podium_probability",
             text=label_col if label_col else None,
             hover_data=[c for c in [label_col] if c] + FEATURE_COLUMNS,
@@ -394,8 +402,9 @@ if results_df is not None:
             labels={"grid": "Starting grid position", "podium_probability": "Podium probability"},
         )
         fig_scatter.update_traces(
+            mode="markers+text",
             marker=dict(
-                sizemin=8,
+                sizemin=10,
                 line=dict(width=1.5, color="black"),
             ),
             textposition="top center",
