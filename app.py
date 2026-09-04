@@ -332,12 +332,31 @@ if results_df is not None:
             x="label",
             y="podium_probability",
             color="podium_probability",
-            color_continuous_scale="RdYlGn",
+            color_continuous_scale="Turbo",
             labels={"label": "Driver", "podium_probability": "Podium probability"},
             title="Podium probability by driver",
+            text="podium_probability",
         )
-        fig_bar.update_layout(yaxis_tickformat=".0%")
-        fig_bar.add_hline(y=threshold, line_dash="dash", line_color="gray")
+        fig_bar.update_traces(
+            texttemplate="%{y:.0%}",
+            textposition="outside",
+            marker=dict(line=dict(width=1, color="black")),
+        )
+        fig_bar.update_layout(
+            yaxis_tickformat=".0%",
+            plot_bgcolor="white",
+            font=dict(size=13),
+        )
+        fig_bar.update_xaxes(showgrid=False)
+        fig_bar.update_yaxes(showgrid=True, gridcolor="lightgray", zeroline=False)
+        fig_bar.add_hline(
+            y=threshold,
+            line_dash="dash",
+            line_color="black",
+            line_width=2,
+            annotation_text=f"Threshold ({threshold:.0%})",
+            annotation_position="top left",
+        )
         st.plotly_chart(fig_bar, use_container_width=True)
 
     with chart_col2:
@@ -348,7 +367,17 @@ if results_df is not None:
             title="Distribution of predicted probabilities",
             labels={"podium_probability": "Podium probability"},
         )
-        fig_hist.update_layout(xaxis_tickformat=".0%")
+        fig_hist.update_traces(
+            marker=dict(color="#2E5EAA", line=dict(width=1, color="black")),
+        )
+        fig_hist.update_layout(
+            xaxis_tickformat=".0%",
+            plot_bgcolor="white",
+            font=dict(size=13),
+            bargap=0.05,
+        )
+        fig_hist.update_xaxes(showgrid=True, gridcolor="lightgray")
+        fig_hist.update_yaxes(showgrid=True, gridcolor="lightgray", zeroline=False)
         st.plotly_chart(fig_hist, use_container_width=True)
 
     if "position_driverStanding" in results_df.columns:
@@ -359,11 +388,26 @@ if results_df is not None:
             y="podium_probability",
             size="wins",
             color="podium_probability",
+            text=label_col if label_col else None,
             hover_data=[c for c in [label_col] if c] + FEATURE_COLUMNS,
-            color_continuous_scale="RdYlGn",
+            color_continuous_scale="Turbo",
             labels={"grid": "Starting grid position", "podium_probability": "Podium probability"},
         )
-        fig_scatter.update_layout(yaxis_tickformat=".0%")
+        fig_scatter.update_traces(
+            marker=dict(
+                sizemin=8,
+                line=dict(width=1.5, color="black"),
+            ),
+            textposition="top center",
+            textfont=dict(size=11, color="black"),
+        )
+        fig_scatter.update_layout(
+            yaxis_tickformat=".0%",
+            plot_bgcolor="white",
+            font=dict(size=13),
+        )
+        fig_scatter.update_xaxes(showgrid=True, gridcolor="lightgray")
+        fig_scatter.update_yaxes(showgrid=True, gridcolor="lightgray", zeroline=False)
         st.plotly_chart(fig_scatter, use_container_width=True)
 
 else:
